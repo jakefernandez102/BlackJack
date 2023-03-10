@@ -20,7 +20,8 @@
     let deck = [],
         typeCards = [ 'C', 'D', 'H', 'S' ],
         specials = [ 'A', 'J', 'Q', 'K' ],
-        playersPoints = [];
+        playersPoints = [],
+        playerTurn = 0;
 
     //Events
     const initApp = () => {
@@ -67,8 +68,11 @@
         btn2Players.disabled = true;
         btn3Players.disabled = true;
         btn4Players.disabled = true;
+
+        let whosNext = giveTurn();
+
         // printCardHTML( askForCard() );
-        printCardHTML( askForCard() );
+        printCardHTML( askForCard(), whosNext );
         // printCardHTML( 'AD' );
     } );
 
@@ -80,6 +84,13 @@
 
     } );
 
+    const giveTurn = () => {
+        console.log( 'Turno giveTurn', playerTurn );
+
+        return playerTurn >= playersPoints.length - 1 ? playerTurn = 0
+            : playerTurn >= 0 ? playerTurn++ : playerTurn;
+
+    };
 
     //Creando un nuevo deck
     const initDeck = ( numberOfPlayers = 2 ) => {
@@ -166,20 +177,25 @@
 
 
     //Imprimiendo cartas en el lado del jugador
-    const printCardHTML = ( card ) => {
+    const printCardHTML = ( card, turn ) => {
+
+        if ( playerTurn === playersPoints.length - 1 ) {
+            playerTurn = 0;
+        }
+        console.log( { turn } );
         const playerScore = document.querySelectorAll( 'small' );
-        playersPoints[ 0 ] += cardValue( card );
+        playersPoints[ turn ] += cardValue( card );
         // playerPoints += 21;
+        validatePlayerPoints( playersPoints[ turn ], turn );
 
-        playerScore[ 0 ].textContent = playersPoints[ 0 ];
+        playerScore[ turn ].textContent = playersPoints[ turn ];
 
-        printPlayerCards( card );
+        printPlayerCards( card, turn );
 
-        validatePlayerPoints( playersPoints[ 0 ] );
     };
 
 
-    const printPlayerCards = ( card ) => {
+    const printPlayerCards = ( card, turn ) => {
         const divPlayerCards = document.querySelectorAll( '.divCards' );
         const playerCard = document.createElement( 'img' );
 
@@ -187,20 +203,20 @@
         playerCard.src = `assets/img/${ card }.png`;
 
 
-        divPlayerCards[ 0 ].appendChild( playerCard );
+        divPlayerCards[ turn ].appendChild( playerCard );
     }
 
-    const validatePlayerPoints = ( points ) => {
+    const validatePlayerPoints = ( points, turn ) => {
         if ( points > 21 ) {
 
             btnAskForCard.disabled = true;
             btnAskStop.disabled = true;
-            turnCPU( points );
+            turnCPU( points, turn );
         } else if ( points === 21 ) {
 
             btnAskForCard.disabled = true;
             btnAskStop.disabled = true;
-            turnCPU( points );
+            turnCPU( points, turn );
         }
     }
 
@@ -222,7 +238,7 @@
         divPlayerCards[ turn ].appendChild( cpuCard );
 
     }
-    const turnCPU = ( minimumPoints ) => {
+    const turnCPU = ( minimumPoints, turn ) => {
         let cpuPoints = 0;
         do {
             let card = askForCard();
@@ -232,7 +248,7 @@
             printCpuCards( card, ( playersPoints.length - 1 ) );
 
         } while ( ( cpuPoints < minimumPoints ) && ( minimumPoints <= 21 ) );
-        validateResults( cpuPoints, minimumPoints );
+        validateResults( cpuPoints, minimumPoints, turn );
     };
 
 
@@ -264,43 +280,44 @@
 
         deck = crearDeck();
 
+        for ( const i in divPlayerCards ) {
 
-
-        while ( divPlayerCards[ 0 ].firstChild ) {
-            divPlayerCards[ 0 ].removeChild( divPlayerCards[ 0 ].firstChild );
-        }
-        while ( divPlayerCards[ 1 ].firstChild ) {
-            divPlayerCards[ 1 ].removeChild( divPlayerCards[ 1 ].firstChild );
+            while ( divPlayerCards[ i ].firstChild ) {
+                divPlayerCards[ i ].removeChild( divPlayerCards[ i ].firstChild );
+            }
+            while ( divPlayerCards[ i ].firstChild ) {
+                divPlayerCards[ i ].removeChild( divPlayerCards[ i ].firstChild );
+            }
         }
     }
 
-    const validateResults = ( cpuPoints, minimumPoints ) => {
+    const validateResults = ( cpuPoints, minimumPoints, turn ) => {
 
         if ( minimumPoints === 21 && cpuPoints === 21 ) {
-            return printAlert( 'Is a tie!!!', 'tie' );
+            return printAlert( `Is a tie!!!`, 'tie' );
         }
         if ( minimumPoints > 21 ) {
-            return printAlert( 'You loose!!!', 'error' );
+            return printAlert( `Player ${ turn + 1 } You loose!!!`, 'error' );
         }
         if ( cpuPoints === 21 ) {
-            return printAlert( 'You loose!!!', 'error' );
+            return printAlert( `Player ${ turn + 1 } You loose!!!`, 'error' );
         }
 
         if ( cpuPoints > minimumPoints && cpuPoints < 21 ) {
-            return printAlert( 'You loose!!!', 'error' );
+            return printAlert( `Player ${ turn + 1 } You loose!!!`, 'error' );
         }
 
         if ( minimumPoints === cpuPoints ) {
-            return printAlert( 'You loose!!!', 'error' );
+            return printAlert( `Player ${ turn + 1 } You loose!!!`, 'error' );
         }
         if ( minimumPoints === cpuPoints ) {
-            return printAlert( 'You loose!!!', 'error' );
+            return printAlert( `Player ${ turn + 1 } You loose!!!`, 'error' );
         }
         if ( cpuPoints > 21 ) {
-            return printAlert( 'You win!!!' );
+            return printAlert( `Player ${ turn + 1 } You win!!!` );
         }
         if ( minimumPoints < 21 && cpuPoints > 21 ) {
-            return printAlert( 'You win!!!' );
+            return printAlert( `Player ${ turn + 1 } You win!!!` );
         }
 
 
