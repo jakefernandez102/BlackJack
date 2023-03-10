@@ -7,8 +7,7 @@
 
 ( () => {
     'use strict'
-    const playerScore = document.querySelectorAll( 'small' ),
-        divPlayerCards = document.querySelectorAll( '.divCards' );
+    const divField = document.querySelector( '.field' );
 
     const headerAlert = document.querySelector( '.header' ),
         btnAskNewGame = document.querySelector( '#btn-newGame' ),
@@ -30,12 +29,15 @@
             initDeck();
 
             btn2Players.addEventListener( 'click', () => {
+                cleanFields();
                 initDeck( 3 );
             } );
             btn3Players.addEventListener( 'click', () => {
+                cleanFields();
                 initDeck( 4 );
             } );
             btn4Players.addEventListener( 'click', () => {
+                cleanFields();
                 initDeck( 5 )
             } );
 
@@ -43,9 +45,16 @@
     };
     initApp();
 
-
+    const cleanFields = () => {
+        while ( divField.firstChild ) {
+            divField.removeChild( divField.firstChild )
+        }
+    }
 
     btnAskNewGame.addEventListener( 'click', () => {
+        btn2Players.disabled = false;
+        btn3Players.disabled = false;
+        btn4Players.disabled = false;
 
         btnAskForCard.disabled = false;
         btnAskStop.disabled = false;
@@ -54,7 +63,10 @@
     } );
 
     btnAskForCard.addEventListener( 'click', () => {
-
+        console.log( playersPoints );
+        btn2Players.disabled = true;
+        btn3Players.disabled = true;
+        btn4Players.disabled = true;
         // printCardHTML( askForCard() );
         printCardHTML( askForCard() );
         // printCardHTML( 'AD' );
@@ -78,7 +90,38 @@
             playersPoints.push( 0 );
         };
         console.log( playersPoints );
+        createFields( numberOfPlayers - 1 );
     }
+
+    const createFields = ( numberOfPlayers ) => {
+
+        for ( let i = 0; i < numberOfPlayers; i++ ) {
+
+            const field = document.createElement( 'DIV' );
+            field.classList.add( 'row', 'container-fluid' );
+            field.innerHTML = `
+                <div class="col">
+                    <h1>Player ${ i + 1 }: <small id="playerScore">0</small></h1>
+                    <div id="player-cards" class="divCards">
+    
+                    </div>
+                </div>
+            `;
+            divField.appendChild( field );
+        }
+        const fieldCpu = document.createElement( 'DIV' );
+        fieldCpu.classList.add( 'row', 'container-fluid' );
+        fieldCpu.innerHTML = `
+            <div class="col">
+                <h1>CPU: <small id="cpuScore">0</small></h1>
+                <div id="cpu-cards" class="divCards">
+
+                </div>
+            </div>
+        `;
+        divField.appendChild( fieldCpu );
+
+    };
 
     const crearDeck = () => {
 
@@ -124,7 +167,7 @@
 
     //Imprimiendo cartas en el lado del jugador
     const printCardHTML = ( card ) => {
-
+        const playerScore = document.querySelectorAll( 'small' );
         playersPoints[ 0 ] += cardValue( card );
         // playerPoints += 21;
 
@@ -137,6 +180,7 @@
 
 
     const printPlayerCards = ( card ) => {
+        const divPlayerCards = document.querySelectorAll( '.divCards' );
         const playerCard = document.createElement( 'img' );
 
         playerCard.classList.add( 'carta' );
@@ -161,7 +205,7 @@
     }
 
     const addPointsPlayers = ( card, turn ) => {
-
+        const playerScore = document.querySelectorAll( 'small' );
         playersPoints[ turn ] += cardValue( card );
         playerScore[ turn ].textContent = playersPoints[ turn ];
         return playersPoints[ turn ]
@@ -170,6 +214,7 @@
 
     //CPU turn
     const printCpuCards = ( card, turn ) => {
+        const divPlayerCards = document.querySelectorAll( '.divCards' );
         const cpuCard = document.createElement( 'img' );
         cpuCard.classList.add( 'carta' );
         cpuCard.src = `assets/img/${ card }.png`;
@@ -213,8 +258,13 @@
     };
 
     const cleanHTML = () => {
+        const playerScore = document.querySelectorAll( 'small' );
+        const divPlayerCards = document.querySelectorAll( '.divCards' );
         playerScore.forEach( elem => elem.textContent = 0 )
-        initDeck();
+
+        deck = crearDeck();
+
+
 
         while ( divPlayerCards[ 0 ].firstChild ) {
             divPlayerCards[ 0 ].removeChild( divPlayerCards[ 0 ].firstChild );
