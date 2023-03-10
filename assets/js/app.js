@@ -28,18 +28,21 @@
         document.addEventListener( 'DOMContentLoaded', () => {
 
             initDeck();
-
+            createFields();
             btn2Players.addEventListener( 'click', () => {
                 cleanFields();
                 initDeck( 3 );
+                createFields( 2 );
             } );
             btn3Players.addEventListener( 'click', () => {
                 cleanFields();
                 initDeck( 4 );
+                createFields( 3 );
             } );
             btn4Players.addEventListener( 'click', () => {
                 cleanFields();
                 initDeck( 5 )
+                createFields( 4 );
             } );
 
         } );
@@ -61,6 +64,8 @@
         btnAskStop.disabled = false;
         // printCardHTML( askForCard() );
         cleanHTML();
+        cleanFields();
+        createFields();
     } );
 
     btnAskForCard.addEventListener( 'click', () => {
@@ -87,8 +92,23 @@
     const giveTurn = () => {
         console.log( 'Turno giveTurn', playerTurn );
 
+        validateTurn( playerTurn );
+
         return playerTurn >= playersPoints.length - 1 ? playerTurn = 0
             : playerTurn >= 0 ? playerTurn++ : playerTurn;
+
+    };
+    const validateTurn = ( turn ) => {
+        console.log( { turn } );
+        const cardField = document.querySelectorAll( '.cardField > h1' );
+        console.log( cardField[ ( playersPoints.length - 2 ) ] );
+        cardField[ turn ].style.color = 'yellow';
+        if ( turn > 0 ) {
+            cardField[ ( turn - 1 ) ].style.color = 'white';
+        }
+        if ( turn === 0 ) {
+            cardField[ ( playersPoints.length - 2 ) ].style.color = 'white';
+        }
 
     };
 
@@ -101,17 +121,17 @@
             playersPoints.push( 0 );
         };
         console.log( playersPoints );
-        createFields( numberOfPlayers - 1 );
+
     }
 
-    const createFields = ( numberOfPlayers ) => {
+    const createFields = ( numberOfPlayers = 1 ) => {
 
         for ( let i = 0; i < numberOfPlayers; i++ ) {
 
             const field = document.createElement( 'DIV' );
             field.classList.add( 'row', 'container-fluid' );
             field.innerHTML = `
-                <div class="col">
+                <div class="col cardField">
                     <h1>Player ${ i + 1 }: <small id="playerScore">0</small></h1>
                     <div id="player-cards" class="divCards">
     
@@ -123,7 +143,7 @@
         const fieldCpu = document.createElement( 'DIV' );
         fieldCpu.classList.add( 'row', 'container-fluid' );
         fieldCpu.innerHTML = `
-            <div class="col">
+            <div class="col cardField">
                 <h1>CPU: <small id="cpuScore">0</small></h1>
                 <div id="cpu-cards" class="divCards">
 
@@ -276,9 +296,10 @@
     const cleanHTML = () => {
         const playerScore = document.querySelectorAll( 'small' );
         const divPlayerCards = document.querySelectorAll( '.divCards' );
+
         playerScore.forEach( elem => elem.textContent = 0 )
 
-        deck = crearDeck();
+        initDeck();
 
         for ( const i in divPlayerCards ) {
 
